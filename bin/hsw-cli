@@ -437,6 +437,13 @@ class CLI {
     this.log(details);
   }
 
+  async deleteTX() {
+    const hash = this.config.str(0);
+    const deletion = await this.wallet.deleteTX(hash);
+
+    this.log(deletion);
+  }
+
   async getWalletBlocks() {
     const blocks = await this.wallet.getBlocks();
     this.log(blocks);
@@ -599,6 +606,9 @@ class CLI {
         break;
       case 'coins':
         await this.getWalletCoins();
+        break;
+      case 'deletetx':
+        await this.deleteTX();
         break;
       case 'dump':
         await this.getWIF();
