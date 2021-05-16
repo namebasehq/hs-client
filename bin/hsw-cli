@@ -2,6 +2,8 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const Config = require('bcfg');
 const WalletClient = require('../lib/wallet');
 const EXP = 6;
@@ -57,6 +59,7 @@ Admin commands require admin permissions for provided authorization token:
   $ master: View wallet master key.
   $ rescan [height]: Rescan for transactions.
   $ resend: Resend pending transactions for all wallets.
+  $ restore [backup]: Restore wallet(s) from backup.
   $ rpc [command] [args]: Execute RPC command.
   $ wallets: List all wallets.
 
@@ -566,6 +569,23 @@ class CLI {
     this.log(result);
   }
 
+  async restore() {
+    if (this.argv.length !== 1) {
+      this.log('Please provide backup file path.');
+      return;
+    }
+
+    const filePath = this.argv[0];
+    const resolvedPath = path.resolve(filePath);
+
+    if (!fs.existsSync(resolvedPath)) {
+      this.log(`Provided backup file "${resolvedPath}" does not exists.`);
+      return;
+    }
+
+    await this.client.post('/walletrestorefromfile', {filePath});
+  }
+
   async handleWallet() {
     switch (this.argv.shift()) {
       case 'abandon':
@@ -657,6 +677,9 @@ class CLI {
         break;
       case 'resendwallet':
         await this.resendWallet();
+        break;
+      case 'restore':
+        await this.restore();
         break;
       case 'retoken':
         await this.retoken();
