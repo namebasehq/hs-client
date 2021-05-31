@@ -4,6 +4,8 @@
 
 const Config = require('bcfg');
 const WalletClient = require('../lib/wallet');
+const path = require('path');
+const fs = require("fs");
 const EXP = 6;
 
 const ports = {
@@ -485,10 +487,7 @@ class CLI {
 
     if (this.argv.length != 1) {
       console.log("Please provide backup file path")
-    }
-
-    const path = require('path');
-    const fs = require("fs");
+    }    
 
     const filePath = this.argv[0];    
     const resolvedPath = path.resolve(filePath);
