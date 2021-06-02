@@ -4,6 +4,8 @@
 
 const Config = require('bcfg');
 const WalletClient = require('../lib/wallet');
+const path = require('path');
+const fs = require("fs");
 const EXP = 6;
 
 const ports = {
@@ -481,6 +483,24 @@ class CLI {
     this.log(result);
   }
 
+  async restore() {
+
+    if (this.argv.length != 1) {
+      console.log("Please provide backup file path")
+    }    
+
+    const filePath = this.argv[0];    
+    const resolvedPath = path.resolve(filePath);
+
+    
+    if (!fs.existsSync(resolvedPath)) {
+      this.log('Provided backup file does not exists ...');
+      return;
+    }    
+    
+    await this.client.post('/walletrestorefromfile', {filePath});
+  }
+
   async handleWallet() {
     switch (this.argv.shift()) {
       case 'listen':
@@ -594,6 +614,9 @@ class CLI {
       case 'rescan':
         await this.rescan();
         break;
+      case 'restore':
+        await this.restore();
+        break;
       default:
         this.log('Unrecognized command.');
         this.log('Commands:');
@@ -628,6 +651,7 @@ class CLI {
         this.log('  $ unlock [passphrase] [timeout?]: Unlock wallet.');
         this.log('  $ resend: Resend pending transactions.');
         this.log('  $ rescan [height]: Rescan for transactions.');
+        this.log('  $ restore [backup]: Restore wallet(s) from backup.');
         this.log('Other Options:');
         this.log('  --passphrase [passphrase]: For signing/account-creation.');
         this.log('  --account [account-name]: Account name.');
